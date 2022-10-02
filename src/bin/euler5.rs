@@ -12,7 +12,7 @@ struct PowerMap {
 }
 
 impl PowerMap {
-    fn new() -> Self {
+    fn new() -> PowerMap {
         PowerMap {
             powers: HashMap::new(),
         }
