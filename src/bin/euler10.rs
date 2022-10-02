@@ -4,8 +4,8 @@
 
 use rust_euler::Primes;
 
-fn sum_primes_below(limit: u64) -> u64 {
-    Primes::new().take_while(|&p| p < limit).sum()
+fn sum_primes_below(end: u64) -> u64 {
+    Primes::new().take_while(|&p| p < end).sum()
 }
 
 fn euler10() -> u64 {
