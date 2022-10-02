@@ -8,7 +8,7 @@ fn sum_primes_below(limit: u64) -> u64 {
     Primes::new().take_while(|&p| p < limit).sum()
 }
 
-fn euler() -> u64 {
+fn euler10() -> u64 {
     sum_primes_below(2_000_000)
 }
 
@@ -24,11 +24,11 @@ mod test {
     // This test takes tens of seconds to complete, even in release mode.
     #[ignore]
     #[test]
-    fn test_euler() {
-        assert_eq!(euler(), 142913828922);
+    fn test_euler10() {
+        assert_eq!(euler10(), 142913828922);
     }
 }
 
 fn main() {
-    println!("{}", euler());
+    println!("{}", euler10());
 }
