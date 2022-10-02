@@ -21,9 +21,11 @@ mod test {
         assert_eq!(sum_primes_below(10), 17);
     }
 
+    // This test takes tens of seconds to complete, even in release mode.
+    #[ignore]
     #[test]
     fn test_euler() {
-        assert_eq!(euler(), todo!());
+        assert_eq!(euler(), 142913828922);
     }
 }
 
