@@ -12,7 +12,7 @@ mod test {
     use super::*;
 
     #[test]
-    fn test() {
+    fn test_euler1() {
         assert_eq!(euler1(), 233168);
     }
 }
