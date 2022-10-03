@@ -9,16 +9,11 @@ fn is_palindrome(n: u64) -> bool {
 }
 
 fn euler4() -> u64 {
-    let mut result = 0;
-    for i in 100..=999 {
-        for j in 100..=999 {
-            let n = i * j;
-            if is_palindrome(n) && n > result {
-                result = n;
-            }
-        }
-    }
-    result
+    (100..=999)
+        .flat_map(move |i| (100..=999).map(move |j| i * j))
+        .filter_map(|n| is_palindrome(n).then_some(n))
+        .max()
+        .expect("range should include at least one palindrome")
 }
 
 #[cfg(test)]
