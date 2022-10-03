@@ -1,4 +1,5 @@
 /// An iterator over the prime numbers.
+#[derive(Default)]
 pub struct Primes {
     known: Vec<u64>,
 }
