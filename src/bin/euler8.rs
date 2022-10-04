@@ -54,8 +54,9 @@ fn highest_product(len: usize) -> u64 {
         .flat_map(|c| c.to_digit(10))
         .map(|d| d as u64)
         .collect();
-    (0..(digits.len() - len))
-        .map(|i| digits[i..(i + len)].iter().product())
+    digits
+        .windows(len)
+        .map(|w| w.iter().product())
         .max()
         .unwrap_or(1)
 }
