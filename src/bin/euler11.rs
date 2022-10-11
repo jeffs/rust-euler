@@ -82,22 +82,20 @@ fn downward_diagonal_products<const W: usize, const H: usize>(
 
 /// Iterates over the products of all upward sloping diagonals of length len.
 fn upward_diagonal_products<const W: usize, const H: usize>(
-    _rows: &[[u8; W]; H],
-    _len: usize,
-) -> impl Iterator<Item = u32> + '_ {
-    [].into_iter()
-}
-
-/// Iterates over the products of all diagonal windows of length len in rows.
-fn diagonal_products<const W: usize, const H: usize>(
     rows: &[[u8; W]; H],
     len: usize,
 ) -> impl Iterator<Item = u32> + '_ {
-    downward_diagonal_products(rows, len)
-        .max()
-        .and_then(|d| upward_diagonal_products(rows, len).max().map(|u| d.max(u)));
-
-    [].into_iter()
+    rows.windows(len).flat_map(move |window_rows| {
+        (0..=(W - len)).map(move |j0| {
+            // Pair each row with the column we want from that row.
+            let window_values = window_rows
+                .iter()
+                .rev()
+                .zip(j0..(j0 + len))
+                .map(|(row, j)| row[j] as u32);
+            window_values.product()
+        })
+    })
 }
 
 fn euler11() -> u32 {
@@ -124,11 +122,12 @@ fn euler11() -> u32 {
         [20, 73, 35, 29, 78, 31, 90, 01, 74, 31, 49, 71, 48, 86, 81, 16, 23, 57, 05, 54],
         [01, 70, 54, 71, 83, 51, 54, 69, 16, 92, 33, 48, 61, 43, 52, 01, 89, 19, 67, 48],
     ];
-    const WINDOW_LEN: usize = 4;
-    horizontal_products(&ROWS, WINDOW_LEN)
+    const LEN: usize = 4; // window length
+    horizontal_products(&ROWS, LEN)
+        .chain(vertical_products(&ROWS, LEN))
+        .chain(downward_diagonal_products(&ROWS, LEN))
+        .chain(upward_diagonal_products(&ROWS, LEN))
         .max()
-        .and_then(|h| vertical_products(&ROWS, WINDOW_LEN).max().map(|v| h.max(v)))
-        .and_then(|m| diagonal_products(&ROWS, WINDOW_LEN).max().map(|d| m.max(d)))
         .expect("grid should contain at least one window")
 }
 
@@ -159,6 +158,11 @@ mod test {
             downward_diagonal_products(&TEST_GRID, 4).max(),
             Some(1788696)
         );
+    }
+
+    #[test]
+    fn test_upward_diagonal_products() {
+        assert_eq!(upward_diagonal_products(&TEST_GRID, 4).max(), Some(2141320));
     }
 }
 
