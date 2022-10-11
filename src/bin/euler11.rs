@@ -36,8 +36,19 @@ const LEN: usize = 4;
 fn max_horizontal<const W: usize, const H: usize>(rows: &[[u32; W]; H]) -> u32 {
     let mut result = 0;
     for row in rows {
-        for j in 0..=(row.len() - LEN) {
+        for j in 0..=(W - LEN) {
             let product = row[j..(j + LEN)].iter().product();
+            result = result.max(product);
+        }
+    }
+    result
+}
+
+fn max_vertical<const W: usize, const H: usize>(rows: &[[u32; W]; H]) -> u32 {
+    let mut result = 0;
+    for i in 0..=(H - LEN) {
+        for j in 0..W {
+            let product = (i..(i + LEN)).map(|i| rows[i][j]).product();
             result = result.max(product);
         }
     }
@@ -75,15 +86,21 @@ fn euler11() -> u32 {
 mod test {
     use super::*;
 
+    const TEST_ROWS: [[u32; 4]; 4] = [
+        [26, 38, 40, 67],
+        [95, 63, 94, 39],
+        [97, 17, 78, 78],
+        [20, 45, 35, 14],
+    ];
+
     #[test]
     fn test_max_horizontal() {
-        let rows = [
-            [26, 38, 40, 67],
-            [95, 63, 94, 39],
-            [97, 17, 78, 78],
-            [20, 45, 35, 14],
-        ];
-        assert_eq!(max_horizontal(&rows), 21941010);
+        assert_eq!(max_horizontal(&TEST_ROWS), 21941010);
+    }
+
+    #[test]
+    fn test_max_vertical() {
+        assert_eq!(max_vertical(&TEST_ROWS), 10264800);
     }
 }
 
