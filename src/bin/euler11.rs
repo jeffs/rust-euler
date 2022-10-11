@@ -55,6 +55,26 @@ fn max_vertical<const W: usize, const H: usize>(rows: &[[u32; W]; H]) -> u32 {
     result
 }
 
+fn max_diagonal<const W: usize, const H: usize>(rows: &[[u32; W]; H]) -> u32 {
+    let mut result = 0;
+    for i in 0..=(H - LEN) {
+        for j in 0..=(W - LEN) {
+            let product = (i..(i + LEN))
+                .zip(j..(j + LEN))
+                .map(|(i, j)| rows[i][j])
+                .product();
+            result = result.max(product);
+        }
+    }
+    result
+}
+
+fn max_product<const W: usize, const H: usize>(rows: &[[u32; W]; H]) -> u32 {
+    max_horizontal(&rows)
+        .max(max_vertical(&rows))
+        .max(max_diagonal(&rows))
+}
+
 fn euler11() -> u32 {
     #[rustfmt::skip]
     let rows = [
@@ -79,28 +99,50 @@ fn euler11() -> u32 {
         [20, 73, 35, 29, 78, 31, 90, 01, 74, 31, 49, 71, 48, 86, 81, 16, 23, 57, 05, 54],
         [01, 70, 54, 71, 83, 51, 54, 69, 16, 92, 33, 48, 61, 43, 52, 01, 89, 19, 67, 48],
     ];
-    max_horizontal(&rows) // .max(max_vertical()).max(max_diagonal())
+    max_product(&rows)
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
 
-    const TEST_ROWS: [[u32; 4]; 4] = [
+    const TEST_ROWS4: [[u32; 4]; 4] = [
         [26, 38, 40, 67],
         [95, 63, 94, 39],
         [97, 17, 78, 78],
         [20, 45, 35, 14],
     ];
 
+    const TEST_ROWS5: [[u32; 5]; 5] = [
+        [26, 38, 40, 67, 01],
+        [95, 63, 94, 39, 01],
+        [97, 17, 78, 78, 01],
+        [20, 45, 35, 14, 99],
+        [01, 01, 01, 01, 01],
+    ];
+
     #[test]
     fn test_max_horizontal() {
-        assert_eq!(max_horizontal(&TEST_ROWS), 21941010);
+        assert_eq!(max_horizontal(&TEST_ROWS4), 21941010);
+        assert_eq!(max_horizontal(&TEST_ROWS5), 21941010);
     }
 
     #[test]
     fn test_max_vertical() {
-        assert_eq!(max_vertical(&TEST_ROWS), 10264800);
+        assert_eq!(max_vertical(&TEST_ROWS4), 10264800);
+        assert_eq!(max_vertical(&TEST_ROWS5), 10264800);
+    }
+
+    #[test]
+    fn test_max_diagonal() {
+        assert_eq!(max_diagonal(&TEST_ROWS4), 1788696);
+        assert_eq!(max_diagonal(&TEST_ROWS5), 27582984);
+    }
+
+    #[test]
+    fn test_max_product() {
+        assert_eq!(max_product(&TEST_ROWS4), 21941010);
+        assert_eq!(max_product(&TEST_ROWS5), 21941010);
     }
 }
 
