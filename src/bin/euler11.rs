@@ -63,6 +63,43 @@ fn vertical_products<const W: usize, const H: usize>(
     })
 }
 
+/// Iterates over the products of all downward sloping diagonals of length len.
+fn downward_diagonal_products<const W: usize, const H: usize>(
+    rows: &[[u8; W]; H],
+    len: usize,
+) -> impl Iterator<Item = u32> + '_ {
+    rows.windows(len).flat_map(move |window_rows| {
+        (0..=(W - len)).map(move |j0| {
+            // Pair each row with the column we want from that row.
+            let window_values = window_rows
+                .iter()
+                .zip(j0..(j0 + len))
+                .map(|(row, j)| row[j] as u32);
+            window_values.product()
+        })
+    })
+}
+
+/// Iterates over the products of all upward sloping diagonals of length len.
+fn upward_diagonal_products<const W: usize, const H: usize>(
+    _rows: &[[u8; W]; H],
+    _len: usize,
+) -> impl Iterator<Item = u32> + '_ {
+    [].into_iter()
+}
+
+/// Iterates over the products of all diagonal windows of length len in rows.
+fn diagonal_products<const W: usize, const H: usize>(
+    rows: &[[u8; W]; H],
+    len: usize,
+) -> impl Iterator<Item = u32> + '_ {
+    downward_diagonal_products(rows, len)
+        .max()
+        .and_then(|d| upward_diagonal_products(rows, len).max().map(|u| d.max(u)));
+
+    [].into_iter()
+}
+
 fn euler11() -> u32 {
     #[rustfmt::skip]
     const ROWS: [[u8; 20]; 20] = [
@@ -91,8 +128,8 @@ fn euler11() -> u32 {
     horizontal_products(&ROWS, WINDOW_LEN)
         .max()
         .and_then(|h| vertical_products(&ROWS, WINDOW_LEN).max().map(|v| h.max(v)))
+        .and_then(|m| diagonal_products(&ROWS, WINDOW_LEN).max().map(|d| m.max(d)))
         .expect("grid should contain at least one window")
-    //.max(max_diagonal(&rows))
 }
 
 #[cfg(test)]
@@ -114,6 +151,14 @@ mod test {
     #[test]
     fn test_vertical_products_max() {
         assert_eq!(vertical_products(&TEST_GRID, 4).max(), Some(10264800));
+    }
+
+    #[test]
+    fn test_downward_diagonal_products() {
+        assert_eq!(
+            downward_diagonal_products(&TEST_GRID, 4).max(),
+            Some(1788696)
+        );
     }
 }
 
