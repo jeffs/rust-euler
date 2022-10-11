@@ -30,6 +30,14 @@
 //! What is the greatest product of four adjacent numbers in the same direction
 //! (up, down, left, right, or diagonally) in the 20×20 grid?
 
+// This module uses the following naming conventions:
+//
+// * `W` is a grid width
+// * `H` is a grid height
+// * `i` is a row index
+// * `j` is a column index
+
+/// Iterates over the products of all horizontal windows of length len in rows.
 fn horizontal_products<const W: usize, const H: usize>(
     rows: &[[u8; W]; H],
     len: usize,
@@ -42,9 +50,22 @@ fn horizontal_products<const W: usize, const H: usize>(
     })
 }
 
+/// Iterates over the products of all vertical windows of length len in rows.
+fn vertical_products<const W: usize, const H: usize>(
+    rows: &[[u8; W]; H],
+    len: usize,
+) -> impl Iterator<Item = u32> + '_ {
+    rows.windows(len).flat_map(|window_rows| {
+        (0..W).map(|j| {
+            let window_values = window_rows.iter().map(move |row| row[j] as u32);
+            window_values.product()
+        })
+    })
+}
+
 fn euler11() -> u32 {
     #[rustfmt::skip]
-    let rows: [[u8; 20]; 20] = [
+    const ROWS: [[u8; 20]; 20] = [
         [08, 02, 22, 97, 38, 15, 00, 40, 00, 75, 04, 05, 07, 78, 52, 12, 50, 77, 91, 08],
         [49, 49, 99, 40, 17, 81, 18, 57, 60, 87, 17, 40, 98, 43, 69, 48, 04, 56, 62, 00],
         [81, 49, 31, 73, 55, 79, 14, 29, 93, 71, 40, 67, 53, 88, 30, 03, 49, 13, 36, 65],
@@ -66,10 +87,11 @@ fn euler11() -> u32 {
         [20, 73, 35, 29, 78, 31, 90, 01, 74, 31, 49, 71, 48, 86, 81, 16, 23, 57, 05, 54],
         [01, 70, 54, 71, 83, 51, 54, 69, 16, 92, 33, 48, 61, 43, 52, 01, 89, 19, 67, 48],
     ];
-    horizontal_products(&rows, 4)
+    const WINDOW_LEN: usize = 4;
+    horizontal_products(&ROWS, WINDOW_LEN)
         .max()
+        .and_then(|h| vertical_products(&ROWS, WINDOW_LEN).max().map(|v| h.max(v)))
         .expect("grid should contain at least one window")
-    //.max(max_vertical(&rows))
     //.max(max_diagonal(&rows))
 }
 
@@ -87,6 +109,11 @@ mod test {
     #[test]
     fn test_horizontal_products_max() {
         assert_eq!(horizontal_products(&TEST_GRID, 4).max(), Some(21941010));
+    }
+
+    #[test]
+    fn test_vertical_products_max() {
+        assert_eq!(vertical_products(&TEST_GRID, 4).max(), Some(10264800));
     }
 }
 
